@@ -18,7 +18,7 @@ namespace Template.MVC.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult Devextreme()
         {
             return View();
         }
