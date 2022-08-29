@@ -1,174 +1,160 @@
 ﻿@{
     ViewData["Title"] = "Devextreme";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            @(Html.DevExtreme().DataGrid()
+                .ID("dataGrid")
+                @*.DataSource({})*@
+                .KeyExpr("externalGuid")
+                .FilterRow(f => f.Visible(true))
+                .SearchPanel(s => s.Visible(true))
+                .LoadPanel(l => l.Enabled(true))
+                .Columns(c =>
+                {
+                    c.Add().DataField("name").DataType(GridColumnDataType.String).Caption("Room Name");
+                    c.Add().DataField("address").DataType(GridColumnDataType.String).Caption("IP Address");
+                    c.Add().DataField("port").DataType(GridColumnDataType.String).Caption("Port");
+                    c.Add().DataField("maxPlayers").DataType(GridColumnDataType.String).Caption("Players")
+                    .CalculateCellValue(@"function(e) { maxPlayersCalculatedCellValue(e); }");
+                    c.Add().DataField("preferredGameName").DataType(GridColumnDataType.String).Caption("Game");
+                    c.Add().DataField("owner").DataType(GridColumnDataType.String).Caption("Owner");
+                    c.Add().DataField("hasPassword").DataType(GridColumnDataType.Boolean).Caption("HasPassword?").FalseText("No").TrueText("Yes");
+                })
+                .ColumnAutoWidth(true)
+                .AllowColumnResizing(true)
+                .ColumnResizingMode(ColumnResizingMode.Widget)
+                .ShowBorders(true)
+                .Paging(p => { p.Enabled(true); p.PageSize(10); })
+                .Export(e => { e.Enabled(true); e.AllowExportSelectedData(true); e.FileName("ExportedFile"); })
+                .Pager(p =>
+                {
+                    p.ShowPageSizeSelector(true);
+                    p.AllowedPageSizes(new int[] { 10, 20, 50 });
+                    p.ShowNavigationButtons(true);
+                    p.ShowInfo(true);
+                    p.InfoText("Page {0}. Total: {1} ({2} items)");
+                })
+                .MasterDetail(m =>
+                {
+                    m.Enabled(true);
+                    m.Template("gridMasterDetail(container, options)");
+                })
+                .OnToolbarPreparing(@"function(e) { gridOnToolbarPreparing(e);} ")
+            )
+        </div>
+    </div>
+</div>
 
-@*<div id="dataGrid"></div>*@
 
-@(Html.DevExtreme().DataGrid()
-    .ID("dataGrid")
-)
 
-<script>
-    let lobbyData = null;
-    let grid;
-    //let proxy = "https://fast-dawn-89938.herokuapp.com/";
-    let proxy = "https://api.codetabs.com/v1/proxy?quest=";
+@section Scripts {
+    <script>
+        function maxPlayersCalculatedCellValue(rowData) {
+            let playersCount = rowData.players.length;
+            return playersCount + " / " + rowData.maxPlayers;
+        }
 
-    const columns = [
-        {
-            caption: "Room Name",
-            dataField: "name",
-            dataType: "string",
-        },
-        {
-            caption: "IP Address",
-            dataField: "address",
-            dataType: "string",
-        },
-        {
-            caption: "Port",
-            dataField: "port",
-            dataType: "string",
-        },
-        {
-            caption: "Players",
-            dataField: "maxPlayers",
-            dataType: "string",
-            calculateCellValue: function(rowData) {
-                let playersCount = rowData.players.length;
-                return playersCount + " / " + rowData.maxPlayers;
-            },
-        },
-        {
-            caption: "Game",
-            dataField: "preferredGameName",
-            dataType: "string",
-        },
-        {
-            caption: "Owner",
-            dataField: "owner",
-            dataType: "string",
-        },
-        {
-            caption: "HasPassword?",
-            dataField: "hasPassword",
-            dataType: "boolean",
-            falseText: "No",
-            trueText: "Yes",
-        },
-    ];
-
-    $(function() {
-        $("#dataGrid").dxDataGrid({
-            dataSource: [],
-            keyExpr: "externalGuid",
-            filterRow: { visible: true },
-            searchPanel: { visible: true },
-            loadPanel: {
-                enabled: true,
-            },
-            columns: columns,
-            columnAutoWidth: true,
-            allowColumnResizing: true,
-            columnResizingMode: "widget",
-            showBorders: true,
-            paging: {
-                enabled: true,
-                pageSize: 10,
-            },
-            export: {
-                enabled: true,
-                allowExportSelectedData: true,
-                fileName: "ExportedFile",
-            },
-            pager: {
-                showPageSizeSelector: true,
-                allowedPageSizes: [10, 20, 50],
-                showNavigationButtons: true,
-                showInfo: true,
-                infoText: "Page {0}. Total: {1} ({2} items)",
-            },
-            masterDetail: {
-                enabled: true,
-                // autoExpandAll: true,
-                template: function(container, options) {
-                    var data = options.data;
-                    let playerData = data.players;
-                    $("<div>")
-                        .dxDataGrid({
-                            columnAutoWidth: true,
-                            showBorders: true,
-                            columns: [
-                                {
-                                    dataField: "nickname",
-                                    dataType: "string",
-                                    caption: "Player Name",
-                                },
-                                {
-                                    dataField: "gameName",
-                                    dataType: "string",
-                                    caption: "Game Name",
-                                },
-                            ],
-                            dataSource: playerData,
-                        })
-                        .appendTo(container);
-                },
-            },
-            onToolbarPreparing: function(e) {
-                let gridToolbarItems = e.toolbarOptions.items;
-
-                $.each(gridToolbarItems, function(_, item) {
-                    if (item.name === "searchPanel") {
-                        // Change the item options here
-                        console.log(item);
-                        item.location = "before";
-                    }
-                });
-
-                gridToolbarItems.push({
-                    location: "after",
-                    widget: "dxButton",
-                    options: {
-                        icon: "refresh",
-                        text: "Refresh Data",
-                        onClick() {
-                            grid.refresh();
+        function gridMasterDetail(container, options) {
+            var data = options.data;
+            let playerData = data.players;
+            $("<div>")
+                .dxDataGrid({
+                    columnAutoWidth: true,
+                    showBorders: true,
+                    columns: [
+                        {
+                            dataField: "nickname",
+                            dataType: "string",
+                            caption: "Player Name",
                         },
+                        {
+                            dataField: "gameName",
+                            dataType: "string",
+                            caption: "Game Name",
+                        },
+                    ],
+                    dataSource: playerData,
+                })
+                .appendTo(container);
+        }
+
+        function gridOnToolbarPreparing(e) {
+            let gridToolbarItems = e.toolbarOptions.items;
+
+            $.each(gridToolbarItems, function (_, item) {
+                if (item.name === "searchPanel") {
+                    // Change the item options here
+                    console.log(item);
+                    item.location = "after";
+                }
+            });
+
+            gridToolbarItems.push({
+                location: "after",
+                widget: "dxButton",
+                options: {
+                    icon: "refresh",
+                    text: "Refresh Data",
+                    onClick() {
+                        getData().then((data) => {
+                            lobbyData = data; // fetched movies
+                            grid.option("dataSource", lobbyData);
+                            grid.refresh();
+                        });
                     },
-                });
-            },
-            // remoteOperations: {
-            //   filtering: true,
-            //   paging: true,
-            //   sorting: true,
-            //   groupPaging: true,
-            //   grouping: true,
-            //   summary: true,
-            // },
+                },
+            });
+        }
+
+        let lobbyData = null;
+        let grid;
+        let proxy = "https://api.codetabs.com/v1/proxy?quest=";
+
+        $(function () {
+            grid = $("#dataGrid").dxDataGrid("instance");
+
+            getData().then((data) => {
+                lobbyData = data; // fetched movies
+                grid.option("dataSource", lobbyData);
+            });
         });
 
-        grid = $("#dataGrid").dxDataGrid("instance");
+        async function getData() {
+            let url = proxy + "https://api.citra-emu.org/lobby";
+            var requestOptions = {
+                mode: "cors",
+                headers: {},
+            };
 
-        getData().then((data) => {
-            lobbyData = data; // fetched movies
-            grid.option("dataSource", lobbyData);
-        });
-    });
+            const response = await fetch(url, requestOptions);
+            const data = await response.json();
+            return data.rooms;
+        }
+    </script>
+}
 
-    async function getData() {
-        let url = proxy + "https://api.citra-emu.org/lobby";
-        //   let url = "https://api.citra-emu.org/lobby";
-        var requestOptions = {
-            mode: "cors",
-            headers: {},
-        };
 
-        const response = await fetch(url, requestOptions);
-        const data = await response.json();
-        return data.rooms;
-    }
-</script>
+@section Header {
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">@ViewData["Title"]</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Styles {
+    
+}

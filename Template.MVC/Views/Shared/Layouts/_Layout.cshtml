@@ -1,4 +1,7 @@
-﻿@using Template.MVC.Views.Shared.Components.Header
+﻿@using Template.MVC.Views.Shared.Components.Footer
+@using Template.MVC.Views.Shared.Components.Header
+@using Template.MVC.Views.Shared.Components.Sidebar
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,20 +15,20 @@
     @await Html.PartialAsync("_Styles.cshtml")
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    @(await Component.InvokeAsync<Header>(new {Title = "Asp.Net MVC"}))
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2022 - Template.MVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        @(await Component.InvokeAsync<Header>(new { Title = "Asp.Net MVC" }))
+        @(await Component.InvokeAsync<Sidebar>())
+        <div class="content-wrapper">
+            @await RenderSectionAsync("Header", required: false)
+            <section class="content">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </section>
         </div>
-    </footer>
-
+        @(await Component.InvokeAsync<Footer>())
+    </div>
     @await Html.PartialAsync("_Scripts.cshtml")
     @await RenderSectionAsync("Scripts", required: false)
 </body>
