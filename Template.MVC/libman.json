@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "defaultProvider": "unpkg",
+  "libraries": [
+    {
+      "library": "devextreme-aspnet-data@2.8.6",
+      "destination": "wwwroot/lib/devextreme-aspnet-data/"
+    },
+    {
+      "library": "devextreme@19.1.7",
+      "destination": "wwwroot/lib/devextreme-19.1.7/"
+    },
+    {
+      "library": "admin-lte@3.2.0",
+      "destination": "wwwroot/lib/admin-lte-3.2.0/"
+    },
+    {
+      "library": "bootstrap@4.6.0",
+      "destination": "wwwroot/lib/bootstrap-4.6.0/"
+    },
+    {
+      "library": "bootstrap-icons@1.9.1",
+      "destination": "wwwroot/lib/bootstrap-icons-1.9.1/"
+    },
+    {
+      "library": "jszip@3.10.1",
+      "destination": "wwwroot/lib/jszip-3.10.1/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "font-awesome@6.2.0",
+      "destination": "wwwroot/lib/font-awesome-6.2.0/"
+    }
+  ]
+}
