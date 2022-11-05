@@ -18,7 +18,7 @@
                     c.Add().DataField("address").DataType(GridColumnDataType.String).Caption("IP Address");
                     c.Add().DataField("port").DataType(GridColumnDataType.String).Caption("Port");
                     c.Add().DataField("maxPlayers").DataType(GridColumnDataType.String).Caption("Players")
-                    .CalculateCellValue(@"function(e) { maxPlayersCalculatedCellValue(e); }");
+                        .CalculateCellValue(@"function(e) { return maxPlayersCalculatedCellValue(e); }");
                     c.Add().DataField("preferredGameName").DataType(GridColumnDataType.String).Caption("Game");
                     c.Add().DataField("owner").DataType(GridColumnDataType.String).Caption("Owner");
                     c.Add().DataField("hasPassword").DataType(GridColumnDataType.Boolean).Caption("HasPassword?").FalseText("No").TrueText("Yes");
@@ -40,7 +40,7 @@
                 .MasterDetail(m =>
                 {
                     m.Enabled(true);
-                    m.Template("gridMasterDetail(container, options)");
+                    m.Template(new JS("gridMasterDetail"));
                 })
                 .OnToolbarPreparing(@"function(e) { gridOnToolbarPreparing(e);} ")
             )
@@ -120,6 +120,8 @@
                 lobbyData = data; // fetched movies
                 grid.option("dataSource", lobbyData);
             });
+
+            console.log("Script Loaded.");
         });
 
         async function getData() {
